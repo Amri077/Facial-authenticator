@@ -1,0 +1,72 @@
+import cv2 
+import threading 
+from deepface import DeepFace 
+
+
+def face_checker(frame): 
+    global match_face  # Declare match_face as global to modify it within this function
+    try: 
+        # Perform face verification using separate arguments for each image
+        if DeepFace.verify(frame, reference)["verified"]:  
+            match_face = True 
+        else: 
+            match_face = False 
+    except ValueError:
+        match_face = False
+    except Exception as e:
+        print(f"An error occurred in face_checker: {e}")
+        match_face = False
+        
+        
+        
+     
+        
+
+
+capture = cv2.VideoCapture(0, cv2.CAP_AVFOUNDATION)
+capture.set(cv2.CAP_PROP_FRAME_WIDTH,640)
+capture.set(cv2.CAP_PROP_FRAME_HEIGHT,480) 
+
+# Check if the webcam opened successfully
+if not capture.isOpened():
+    print("Error: Could not open webcam.")
+    exit()
+
+counter = 0
+match_face = False 
+reference_pic = cv2.imread("reference.jpg")
+
+if reference_pic is None:
+    print("Error: Could not load the reference image.")
+    exit()
+
+while True:
+    return_value, frame = capture.read()
+
+    if return_value:
+        if counter%30==0:
+            try: 
+                threading.Thread(target = face_checker, args = (frame.copy(),)).start()
+
+            except ValueError:
+                pass
+        counter = counter+1
+    
+    if match_face:
+        cv2.putText(frame, "it is a match", (20,450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,255,0), 3)
+    else:
+         cv2.putText(frame, "No match", (20,450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,255), 3)
+    cv2.imshow("video",frame)
+
+
+
+
+
+
+
+    key = cv2.waitKey(1)
+    if key == ord("q"):
+        break
+
+
+cv2.destroyAllWindows()
